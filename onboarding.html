@@ -118,12 +118,13 @@ body{font-family:'Inter',Arial,sans-serif;background:#0A1628;color:#E2ECF4;-webk
   .hdr h1{font-size:18px}
 }
 </style>
+<script src="/client-config.js"></script>
 </head>
 <body>
 
 <div class="hdr">
   <div class="hdr-brand">Ativos AI — Revenue System Installation</div>
-  <h1>Client Discovery Questionnaire</h1>
+  <h1 id="hdr-title">Client Discovery Questionnaire</h1>
   <p>Takes 15–20 minutes. Your answers build your system.</p>
 </div>
 
@@ -1001,7 +1002,8 @@ async function submitForm() {
   };
 
   try {
-    const res = await fetch('https://formspree.io/f/mjgdqraa', {
+    const formId = (window._clientConfig && window._clientConfig.formId) || 'mjgdqraa';
+    const res = await fetch('https://formspree.io/f/' + formId, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(data)
@@ -1024,6 +1026,30 @@ async function submitForm() {
 }
 
 updateProgress();
+
+// Client config system — reads ?client= URL param and personalizes the form
+(function() {
+  if (typeof CLIENTS === 'undefined') return;
+  const clientKey = new URLSearchParams(window.location.search).get('client');
+  if (!clientKey) return;
+  const cfg = CLIENTS[clientKey];
+  if (!cfg) return;
+  window._clientConfig = cfg;
+
+  // Update title and header
+  document.title = 'Ativos AI — Client Discovery — ' + cfg.name;
+  document.getElementById('hdr-title').textContent = 'Client Discovery — ' + cfg.name;
+
+  // Pre-fill name field
+  const nameEl = document.getElementById('f-name');
+  if (nameEl) nameEl.value = cfg.name;
+
+  // Update businesses placeholder
+  const bizEl = document.getElementById('f-businesses');
+  if (bizEl && cfg.placeholder_businesses) {
+    bizEl.placeholder = cfg.placeholder_businesses;
+  }
+})();
 </script>
 </body>
 </html>
