@@ -805,6 +805,10 @@ body{font-family:'Inter',Arial,sans-serif;background:#0A1628;color:#E2ECF4;-webk
   </div>
 
   <hr class="divider">
+
+  <div class="field">
+    <label>Do you use a social media scheduling tool?</label>
+    <div class="field-hint">If we build content automation, we want to plug into whatever you already use — or set up a new one.</div>
     <select id="f-tech-social">
       <option value="">Select one</option>
       <option>Later</option>
@@ -847,7 +851,7 @@ body{font-family:'Inter',Arial,sans-serif;background:#0A1628;color:#E2ECF4;-webk
       <li>Your full proposal and pricing gets built</li>
       <li>A 30-min call to confirm scope before we start</li>
       <li>Agreement signed, first payment, build begins</li>
-      <li>Real estate system goes live first — within 2 weeks</li>
+      <li>Your systems go live one by one as each is built</li>
     </ul>
   </div>
 </div>
@@ -1007,10 +1011,11 @@ async function submitForm() {
     await emailjs.send('service_f0ucv31', 'template_vfc5vma', data);
 
     if (true) {
-      document.getElementById('sec7').classList.remove('active');
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById('successScreen').classList.add('show');
       document.getElementById('progressBar').style.width = '100%';
       document.getElementById('progressText').textContent = 'Complete — Thank you';
+      document.getElementById('submitBtn').style.display = 'none';
       window.scrollTo({top:0,behavior:'smooth'});
     } else {
       throw new Error('Submit failed');
