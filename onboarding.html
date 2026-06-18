@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ativos AI — Client Discovery</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A1628;--navy2:#0F1E30;--navy3:#162436;--edge:#1E3048;
+  --blue:#2D9CDB;--blue-lo:rgba(45,156,219,0.08);--blue-br:rgba(45,156,219,0.28);
+  --white:#FFF;--g1:#E2ECF4;--g2:#9BB4C4;--g3:#5C7A8E;--green:#2ECC71;--red:#E74C3C;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',Arial,sans-serif;background:#0A1628;color:#E2ECF4;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.hdr{background:var(--navy);border-bottom:3px solid var(--blue);padding:28px 24px 24px;text-align:center}
+.hdr-brand{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.hdr h1{font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-.3px}
+.hdr p{font-size:14px;color:var(--g2)}
+
+/* PROGRESS */
+.progress-wrap{background:var(--navy2);padding:16px 24px;border-bottom:1px solid var(--edge)}
+.progress-bar-outer{background:var(--edge);border-radius:4px;height:4px;max-width:600px;margin:0 auto 10px}
+.progress-bar-inner{background:var(--blue);height:4px;border-radius:4px;transition:width .4s ease;width:14%}
+.progress-text{text-align:center;font-size:11px;font-weight:700;color:var(--g3);letter-spacing:1px;text-transform:uppercase}
+
+/* CONTAINER */
+.container{max-width:660px;margin:0 auto;padding:32px 20px 80px}
+
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION CARD */
+.section.active{background:var(--navy2);border:1px solid var(--edge);border-radius:12px;padding:32px 28px;margin-bottom:16px}
+
+/* SECTION HEADER */
+.sec-header{margin-bottom:28px}
+.sec-eyebrow{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.sec-title{font-size:22px;font-weight:800;color:var(--white);margin-bottom:8px;letter-spacing:-.3px}
+.sec-desc{font-size:14px;color:var(--g2);line-height:1.65}
+
+/* NOTE BOX */
+.note{background:var(--blue-lo);border-left:3px solid var(--blue);border-radius:0 6px 6px 0;padding:12px 16px;margin-bottom:24px;font-size:13px;color:var(--g1);line-height:1.55}
+
+/* FIELD */
+.field{margin-bottom:24px}
+.field label{display:block;font-size:14px;font-weight:700;color:var(--g1);margin-bottom:5px}
+.field-hint{font-size:12px;color:var(--g3);margin-bottom:8px;line-height:1.5;font-style:italic}
+.field input[type=text],
+.field input[type=email],
+.field input[type=tel],
+.field select,
+.field textarea{
+  width:100%;padding:12px 14px;border:2px solid var(--edge);border-radius:6px;
+  font-size:14px;font-family:'Inter',sans-serif;color:var(--g1);background:var(--navy3);
+  transition:border-color .2s;outline:none;
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--g3)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);background:var(--navy2)}
+.field textarea{resize:vertical;min-height:88px;line-height:1.55}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C7A8E' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field select option{background:var(--navy3);color:var(--g1)}
+
+/* SUBHEADING */
+.subhead{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--blue);padding-bottom:8px;border-bottom:2px solid var(--blue);margin:32px 0 20px;display:inline-block}
+
+/* CHECKBOX GROUP */
+.check-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid var(--edge);border-radius:6px;cursor:pointer;transition:all .2s;background:var(--navy3);user-select:none}
+.check-item:hover{border-color:var(--blue-br);background:var(--navy2)}
+.check-item.on{border-color:var(--blue);background:var(--blue-lo)}
+.check-item input{display:none}
+.check-box{width:18px;height:18px;border:2px solid var(--g3);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;transition:all .2s}
+.check-item.on .check-box{background:var(--blue);border-color:var(--blue);color:#fff}
+.check-item span{font-size:13px;color:var(--g1);font-weight:500}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--edge);margin:28px 0}
+
+/* NAV */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:36px;padding-top:24px;border-top:1px solid var(--edge)}
+.btn{padding:13px 28px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1A82C0;transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--g2);border:2px solid var(--edge)}
+.btn-secondary:hover{border-color:var(--g3);color:var(--g1)}
+.btn-submit{background:var(--blue);color:#fff;padding:15px 36px}
+.btn-submit:hover{background:#1A82C0;transform:translateY(-1px)}
+.step-count{font-size:12px;color:var(--g3);font-weight:600}
+
+/* REQUIRED */
+.req{color:var(--red);margin-left:2px}
+
+.success{display:none;text-align:center;padding:60px 20px;background:var(--navy2);border:1px solid var(--edge);border-radius:12px}
+.success.show{display:block;animation:fadeUp .3s ease}
+.success-icon{width:72px;height:72px;background:var(--blue-lo);border:1px solid var(--blue-br);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:32px}
+.success h2{font-size:24px;font-weight:800;color:var(--white);margin-bottom:10px}
+.success p{font-size:15px;color:var(--g2);line-height:1.6;max-width:400px;margin:0 auto 28px}
+.success-steps{background:var(--navy3);border:1px solid var(--edge);border-radius:8px;padding:20px 24px;text-align:left;max-width:400px;margin:0 auto}
+.success-steps h4{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
+.success-steps li{font-size:14px;color:var(--g2);margin-bottom:10px;padding-left:18px;position:relative;list-style:none}
+.success-steps li::before{content:"→";position:absolute;left:0;color:var(--blue);font-weight:700}
+
+/* ERROR */
+.field.error input,.field.error textarea,.field.error select{border-color:var(--red)}
+.field-error{font-size:12px;color:var(--red);margin-top:4px;font-weight:600}
+
+/* SUBMIT STATE */
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+@media(max-width:500px){
+  .check-group{grid-template-columns:1fr}
+  .hdr h1{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-brand">Ativos AI — Revenue System Installation</div>
+  <h1>Client Discovery Questionnaire</h1>
+  <p>Takes 15–20 minutes. Your answers build your system.</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
+  <div class="progress-text" id="progressText">Section 1 of 7 — About You</div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════ SECTION 1 — ABOUT YOU -->
+<div class="section active" id="sec1">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 1 of 7</div>
+    <div class="sec-title">About You + Your Businesses</div>
+    <p class="sec-desc">This section loads into every AI agent we build for you. Every message your system sends, every piece of content your agents write — it all starts here. Be specific.</p>
+  </div>
+
+  <div class="field">
+    <label>Your full name <span class="req">*</span></label>
+    <input type="text" id="f-name" placeholder="e.g. Melvin Lara">
+  </div>
+
+  <div class="field">
+    <label>Your personal cell number <span class="req">*</span></label>
+    <div class="field-hint">This is your number — not what the system texts from. We provision a dedicated automation number.</div>
+    <input type="tel" id="f-phone" placeholder="e.g. 786-555-1234">
+  </div>
+
+  <div class="field">
+    <label>Your business email <span class="req">*</span></label>
+    <div class="field-hint">Ideally a domain email, not Gmail. This is what your system sends from.</div>
+    <input type="email" id="f-email" placeholder="you@yourbusiness.com">
+  </div>
+
+  <div class="field">
+    <label>What businesses are we building for? <span class="req">*</span></label>
+    <div class="field-hint">List every business by name. One per line. Include all that apply — we scope based on what you list here.</div>
+    <textarea id="f-businesses" placeholder="e.g.&#10;Lara Real Estate Group&#10;Lara Luxury Transportation&#10;Lara Tax Services"></textarea>
+  </div>
+
+  <div class="field">
+    <label>Do you have existing websites for any of these businesses?</label>
+    <div class="field-hint">List any URLs. If none, leave blank — we'll build them.</div>
+    <textarea id="f-websites" placeholder="e.g. www.laragroup.com (real estate)&#10;None for limo or tax yet"></textarea>
+  </div>
+
+  <div class="field">
+    <label>Describe each business in 3–4 sentences like you're explaining it at a dinner. <span class="req">*</span></label>
+    <div class="field-hint">Be specific — what market, what clients, what makes you different. This is what every agent reads before it says or writes anything for you.</div>
+    <textarea id="f-biz-desc" style="min-height:130px" placeholder="e.g. I run a luxury real estate brokerage in South Florida focused on Brickell and Edgewater. I source leads and assign them to 7 agents who work under me..."></textarea>
+  </div>
+
+  <div class="field">
+    <label>Who is your ideal client for each business? <span class="req">*</span></label>
+    <div class="field-hint">Age, income, neighborhood, what they care about, what they're afraid of. The more specific, the better every agent performs. One paragraph per business is ideal.</div>
+    <textarea id="f-ideal-client" style="min-height:130px" placeholder="e.g. Real estate: Miami professionals 30–50, $150K+ income, ready to stop renting, care about location and building quality..."></textarea>
+  </div>
+
+  <div class="field">
+    <label>How would you describe your personal communication style?</label>
+    <div class="field-hint">This is how the agents write on your behalf. Direct? Warm? Formal? Casual? Miami energy?</div>
+    <textarea id="f-voice" placeholder="e.g. Direct and real. I'm a Miami guy — I don't talk corporate. Professional but not stiff."></textarea>
+  </div>
+
+  <div class="field">
+    <label>What are your revenue goals for each business over the next 12 months?</label>
+    <div class="field-hint">Estimates are fine. These give your Finance and CEO agents a target to measure against.</div>
+    <textarea id="f-goals" placeholder="e.g. Real estate: $150K GCI / Transportation: $80K gross / Tax: $40K seasonal"></textarea>
+  </div>
+
+  <div class="field">
+    <label>Your timezone and what hours should the system send messages? <span class="req">*</span></label>
+    <div class="field-hint">The system will only text and email leads during these hours. Outside this window everything pauses — no 2am messages.</div>
+    <select id="f-timezone">
+      <option value="">Select timezone</option>
+      <option>Eastern Time (ET)</option>
+      <option>Central Time (CT)</option>
+      <option>Mountain Time (MT)</option>
+      <option>Pacific Time (PT)</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Approved sending window</label>
+    <select id="f-sending-hours">
+      <option value="">Select hours</option>
+      <option>7am – 8pm</option>
+      <option>8am – 8pm</option>
+      <option>8am – 9pm</option>
+      <option>9am – 8pm</option>
+      <option>9am – 9pm</option>
+    </select>
+  </div>
+
+  <div class="nav">
+    <div class="step-count">1 of 7</div>
+    <button class="btn btn-primary" onclick="next(1)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SECTION 2 — REAL ESTATE -->
+<div class="section" id="sec2">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 2 of 7</div>
+    <div class="sec-title">Real Estate Brokerage</div>
+    <p class="sec-desc">Skip this section if you don't have a real estate business. Otherwise give as much detail as possible — this is the priority build.</p>
+  </div>
+
+  <div class="field">
+    <label>Florida real estate license number + brokerage official name</label>
+    <input type="text" id="f-re-license" placeholder="e.g. BK123456 — Lara Real Estate Group LLC">
+  </div>
+
+  <div class="field">
+    <label>What markets and neighborhoods do you work in?</label>
+    <div class="field-hint">Be specific — this goes into your lead qualification script.</div>
+    <input type="text" id="f-re-markets" placeholder="e.g. Brickell, Edgewater, Wynwood, all of Miami-Dade">
+  </div>
+
+  <div class="field">
+    <label>Do you focus on buyers, sellers, or both? Any property type specialties?</label>
+    <textarea id="f-re-focus" placeholder="e.g. Both buyers and sellers. Specialty in luxury condos $400K–$1M."></textarea>
+  </div>
+
+  <div class="field">
+    <label>Where do your real estate leads come from right now?</label>
+    <div class="field-hint">Select all that apply:</div>
+    <div class="check-group" id="cg-re-leads">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Word of mouth / referral</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>My website</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Zillow</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Realtor.com</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Instagram DMs</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Facebook</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Cold outreach</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Other agents</span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Before you call a lead, what do you most need to know about them?</label>
+    <div class="field-hint">These become the exact questions the AI asks every new lead via SMS.</div>
+    <textarea id="f-re-qualify" placeholder="e.g. Are they buying or selling? Budget range? Target area? Timeline? Pre-approved?"></textarea>
+  </div>
+
+  <div class="field">
+    <label>What is your current average response time to a new lead?</label>
+    <select id="f-re-response">
+      <option value="">Select one</option>
+      <option>Under 15 minutes</option>
+      <option>Within an hour</option>
+      <option>Same day</option>
+      <option>Next day or longer</option>
+      <option>No real process right now</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>What booking tool do you currently use for showings?</label>
+    <div class="field-hint">We'll migrate everything into the built-in GHL calendar — no outside subscriptions needed. This tells us what we're replacing.</div>
+    <select id="f-re-booking-tool">
+      <option value="">Select one</option>
+      <option>Google Calendar only — no booking link</option>
+      <option>Calendly</option>
+      <option>Apple Calendar</option>
+      <option>Nothing — I coordinate manually</option>
+      <option>Other</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>After a lead books a showing, what should happen automatically?</label>
+    <div class="field-hint">This builds your post-booking sequence. Example: Send confirmation immediately, reminder 24hrs before, day-of reminder 2hrs before.</div>
+    <textarea id="f-re-post-booking" placeholder="e.g. Confirmation text immediately. Reminder the day before. Another reminder 2 hours before. If they don't show — reschedule message."></textarea>
+  </div>
+
+  <hr class="divider">
+  <div class="subhead">Your Agents</div>
+
+  <div class="field">
+    <label>How many agents are on your team? List their names and phones if possible.</label>
+    <div class="field-hint">These are the people who will receive lead assignments. Each agent login is priced separately — your answer here affects monthly cost.</div>
+    <textarea id="f-re-agents" style="min-height:110px" placeholder="e.g.&#10;1. Marcus Williams — 786-555-0001&#10;2. Sofia Reyes — 786-555-0002&#10;..."></textarea>
+  </div>
+
+  <div class="field">
+    <label>How do you currently assign leads to agents?</label>
+    <textarea id="f-re-assign" placeholder="e.g. I decide manually based on who fits best. No formal process yet."></textarea>
+  </div>
+
+  <div class="field">
+    <label>What is your commission split or cut structure with agents?</label>
+    <textarea id="f-re-split" placeholder="e.g. I take 30% on leads I provide. Agents keep 100% on leads they bring themselves."></textarea>
+  </div>
+
+  <div class="field">
+    <label>What do you want each agent to be able to do in the system?</label>
+    <div class="field-hint">Select all that apply — this determines whether agents need a login or just notifications:</div>
+    <div class="check-group" id="cg-re-agent-access">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>See only their own leads</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>See all brokerage leads</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Update lead status themselves</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Book showings on their calendar</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Notification only — no login needed</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Not sure — advise me</span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>What is your biggest frustration with how leads are managed right now?</label>
+    <textarea id="f-re-frustration" placeholder="Be honest — this is the exact problem we're solving."></textarea>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-secondary" onclick="prev(2)">← Back</button>
+    <div class="step-count">2 of 7</div>
+    <button class="btn btn-primary" onclick="next(2)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SECTION 3 — TRANSPORTATION -->
+<div class="section" id="sec3">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 3 of 7</div>
+    <div class="sec-title">Transportation Business</div>
+    <p class="sec-desc">Skip if you don't have a transportation business. The goal here is more bookings now, then scaling to more drivers later.</p>
+  </div>
+
+  <div class="field">
+    <label>Official business name for the transportation company</label>
+    <input type="text" id="f-limo-name" placeholder="e.g. Lara Luxury Transportation LLC">
+  </div>
+
+  <div class="field">
+    <label>How many vehicles do you currently have in operation?</label>
+    <div class="field-hint">This determines whether we build a simple booking flow or a fleet availability system.</div>
+    <select id="f-limo-vehicles">
+      <option value="">Select one</option>
+      <option>1 — just me</option>
+      <option>2–3 vehicles</option>
+      <option>4–6 vehicles</option>
+      <option>7+ vehicles</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>How do people currently contact you to book?</label>
+    <div class="check-group" id="cg-limo-contact">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Phone call — my cell</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Text message directly</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Instagram DM</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Website form</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Referral / word of mouth</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Facebook</span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>What information do you need from a client to give them a quote?</label>
+    <div class="field-hint">The AI collects this automatically before you're ever involved.</div>
+    <textarea id="f-limo-quote-info" placeholder="e.g. Date, time, pickup address, drop-off, number of passengers, type of event, vehicle preference"></textarea>
+  </div>
+
+  <div class="field">
+    <label>What is your general pricing structure?</label>
+    <div class="field-hint">Rough ranges are fine. This determines whether we automate quotes or flag for manual pricing.</div>
+    <textarea id="f-limo-pricing" placeholder="e.g. Airport transfers from $150, events from $300, full night from $800+"></textarea>
+  </div>
+
+  <div class="field">
+    <label>What types of jobs do you primarily do right now?</label>
+    <div class="check-group" id="cg-limo-jobs">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Airport transfers</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Weddings</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Corporate events</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Nightlife / parties</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Prom / school events</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Medical transport</span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>How many bookings per month do you estimate you're losing from slow response?</label>
+    <select id="f-limo-lost">
+      <option value="">Select one</option>
+      <option>1–2 per month</option>
+      <option>3–5 per month</option>
+      <option>5+ per month</option>
+      <option>Honestly don't know — probably more than I think</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>What types of clients or jobs do you most want to attract as you grow?</label>
+    <textarea id="f-limo-attract" placeholder="e.g. Corporate airport transfers, high-end weddings, recurring client relationships"></textarea>
+  </div>
+
+  <div class="field">
+    <label>Do you currently send booking confirmations and reminders?</label>
+    <select id="f-limo-confirm">
+      <option value="">Select one</option>
+      <option>Yes — I text manually</option>
+      <option>Sometimes, when I remember</option>
+      <option>Rarely or never</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>In 12 months, what does success look like for this business?</label>
+    <textarea id="f-limo-goal" placeholder="e.g. Hire one driver and step back. Get to $X/month consistently. Land 3 corporate accounts."></textarea>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-secondary" onclick="prev(3)">← Back</button>
+    <div class="step-count">3 of 7</div>
+    <button class="btn btn-primary" onclick="next(3)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SECTION 4 — TAX -->
+<div class="section" id="sec4">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 4 of 7</div>
+    <div class="sec-title">Tax Business</div>
+    <p class="sec-desc">Skip if you don't have a tax business. Your existing client list is your most valuable asset here — the December reactivation campaign can recover $15,000–$25,000 per season automatically.</p>
+  </div>
+
+  <div class="field">
+    <label>Official business name for the tax practice</label>
+    <input type="text" id="f-tax-name" placeholder="e.g. Lara Tax Services LLC">
+  </div>
+
+  <div class="field">
+    <label>Can you export your existing client list as a CSV? We need: First Name, Last Name, Phone, Email.</label>
+    <div class="field-hint">This IS the reactivation campaign. Without the list, that campaign waits.</div>
+    <select id="f-tax-list">
+      <option value="">Select one</option>
+      <option>Yes — can export from my tax software</option>
+      <option>Yes — have it in a spreadsheet already</option>
+      <option>Partial — missing some emails or phones</option>
+      <option>No — need to build it manually</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Approximately how many past clients are on that list?</label>
+    <select id="f-tax-list-size">
+      <option value="">Select one</option>
+      <option>Under 25</option>
+      <option>25–50</option>
+      <option>50–100</option>
+      <option>100–200</option>
+      <option>200+</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Your busiest months for tax prep:</label>
+    <div class="check-group" id="cg-tax-months">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>January</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>February</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>March</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>April</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>September</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>October (extensions)</span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Average fee per tax return?</label>
+    <input type="text" id="f-tax-fee" placeholder="e.g. $200 simple personal, $400–$600 business returns">
+  </div>
+
+  <div class="field">
+    <label>How do new tax clients currently find you?</label>
+    <div class="check-group" id="cg-tax-leads">
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Referrals</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Instagram</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Google search</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Facebook</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>Word of mouth</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><div class="check-box">✓</div><span>They don't — I find them</span></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Open to a referral incentive in the reactivation campaign?</label>
+    <div class="field-hint">Example: "Refer a friend and you both get $25 off." Optional but high-converting.</div>
+    <select id="f-tax-referral">
+      <option value="">Select one</option>
+      <option>Yes — open to it, let's discuss</option>
+      <option>Maybe — depends on the offer</option>
+      <option>No — prefer no discounts</option>
+    </select>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-secondary" onclick="prev(4)">← Back</button>
+    <div class="step-count">4 of 7</div>
+    <button class="btn btn-primary" onclick="next(4)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SECTION 5 — WEBSITES -->
+<div class="section" id="sec5">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 5 of 7</div>
+    <div class="sec-title">Your Websites</div>
+    <p class="sec-desc">Answer for each website we're building. If you don't need a website for a particular business, leave that section blank.</p>
+  </div>
+
+  <div class="note">We build clean, professional websites on your domain. Each site is designed for one job — getting the visitor to take one specific action.</div>
+
+  <div class="subhead">Primary Business Website</div>
+
+  <div class="field">
+    <label>Business name for this site + desired domain</label>
+    <div class="field-hint">If you own a domain already, list it. If not, what name do you want?</div>
+    <input type="text" id="f-web1-domain" placeholder="e.g. larabrokeragefl.com or I don't have one yet">
+  </div>
+
+  <div class="field">
+    <label>What is the ONE thing you want a visitor to do on this site?</label>
+    <textarea id="f-web1-cta" placeholder="e.g. Request a showing. Get a free home valuation. Contact me directly."></textarea>
+  </div>
+
+  <div class="field">
+    <label>List 2–3 websites you like the look and feel of</label>
+    <textarea id="f-web1-inspo" placeholder="e.g. compassre.com, onsilverball.com — clean, premium, Miami luxury feel"></textarea>
+  </div>
+
+  <div class="field">
+    <label>Do you have professional photos for this business?</label>
+    <select id="f-web1-photos">
+      <option value="">Select one</option>
+      <option>Yes — professional photos ready to send</option>
+      <option>Yes — good phone photos available</option>
+      <option>No — need to get them taken</option>
+      <option>N/A — this site is brand only, no face</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Do you have a logo or brand materials for this business?</label>
+    <select id="f-web1-brand">
+      <option value="">Select one</option>
+      <option>Yes — logo file ready to send</option>
+      <option>Partial — have ideas but nothing finalized</option>
+      <option>No — starting from scratch</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Do you want a live booking form or lead capture form embedded on this site?</label>
+    <div class="field-hint">This connects directly to your GHL system — leads go straight into your pipeline the moment someone submits.</div>
+    <select id="f-web1-form">
+      <option value="">Select one</option>
+      <option>Yes — I want a booking or inquiry form embedded</option>
+      <option>No — just a contact button or phone number</option>
+      <option>Not sure — advise me</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>How complex does this site need to be?</label>
+    <div class="field-hint">This affects build time and cost. Simple = clean, sharp, converts. Feature-rich = more pages, more functionality, longer timeline.</div>
+    <select id="f-web1-complexity">
+      <option value="">Select one</option>
+      <option>Simple — 1 to 3 pages, clean design, fast to launch</option>
+      <option>Medium — 4 to 6 pages, some features like blog or listings</option>
+      <option>Feature-rich — multiple sections, integrations, custom functionality</option>
+      <option>Not sure — advise me based on my goals</option>
+    </select>
+  </div>
+
+  <hr class="divider">
+  <div class="subhead">Second Business Website (if applicable)</div>
+
+  <div class="field">
+    <label>Business name + desired domain</label>
+    <input type="text" id="f-web2-domain" placeholder="Leave blank if not applicable">
+  </div>
+
+  <div class="field">
+    <label>What should a visitor do on this site?</label>
+    <textarea id="f-web2-cta" placeholder="e.g. Request a quote. Book directly. Call immediately."></textarea>
+  </div>
+
+  <div class="field">
+    <label>What feeling should this site have? Any reference sites?</label>
+    <textarea id="f-web2-feel" placeholder="e.g. Premium and sleek. Clean and corporate. Any sites you like?"></textarea>
+  </div>
+
+  <hr class="divider">
+  <div class="subhead">Third Business Website (if applicable)</div>
+
+  <div class="field">
+    <label>Business name + desired domain</label>
+    <input type="text" id="f-web3-domain" placeholder="Leave blank if not applicable">
+  </div>
+
+  <div class="field">
+    <label>What should a visitor do on this site?</label>
+    <textarea id="f-web3-cta" placeholder="e.g. Book a consultation. Get a quote. Contact me directly."></textarea>
+  </div>
+
+  <div class="field">
+    <label>What feeling should this site have? Any reference sites?</label>
+    <textarea id="f-web3-feel" placeholder="e.g. Trustworthy and professional. Warm and community-focused."></textarea>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-secondary" onclick="prev(5)">← Back</button>
+    <div class="step-count">5 of 7</div>
+    <button class="btn btn-primary" onclick="next(5)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SECTION 6 — WAR ROOM -->
+<div class="section" id="sec6">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 6 of 7</div>
+    <div class="sec-title">Your War Room</div>
+    <p class="sec-desc">The War Room is your AI operating system — 7 agents running content strategy, marketing, sales prep, operations, client success, finance, and CEO-level decisions across all your businesses every day. Your answers here determine how well they perform from day one.</p>
+  </div>
+
+  <div class="subhead">Content + Marketing</div>
+
+  <div class="field">
+    <label>Who are your top 3 competitors in your primary market?</label>
+    <div class="field-hint">The Content and Marketing agents will research them, track their content, and tell you what's working so you can do it better.</div>
+    <textarea id="f-wr-competitors" placeholder="e.g. Compass Miami, ONE Sotheby's, Related Group — real estate brokerage South Florida"></textarea>
+  </div>
+
+  <div class="field">
+    <label>What does your current social media presence look like?</label>
+    <div class="field-hint">List handles, how often you post, what gets the most engagement. If you have no account for a business, say so.</div>
+    <textarea id="f-wr-social" style="min-height:100px" placeholder="e.g. Instagram @melvinlaragroup — post about once a week. Listings and personal posts. Personal gets more engagement."></textarea>
+  </div>
+
+  <div class="field">
+    <label>What kind of content performs well in your market right now?</label>
+    <div class="field-hint">Your read on this helps the Content Agent start in the right direction instead of guessing.</div>
+    <textarea id="f-wr-content" placeholder="e.g. Lifestyle and Miami living content. Market updates. Before/after renovations. Personal story posts."></textarea>
+  </div>
+
+  <div class="subhead">Your Day</div>
+
+  <div class="field">
+    <label>What time of day do you have 15–20 minutes to review agent outputs and act on them?</label>
+    <select id="f-wr-time">
+      <option value="">Select one</option>
+      <option>Morning before calls (7–9am)</option>
+      <option>Midday break (12–1pm)</option>
+      <option>Evening after work (6–8pm)</option>
+      <option>Varies — no consistent window</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>What are the top 3 things you do today that you wish were handled automatically?</label>
+    <div class="field-hint">This tells us which agents and loops to build first.</div>
+    <textarea id="f-wr-automate" placeholder="e.g. 1. Following up with leads who don't respond&#10;2. Writing Instagram captions&#10;3. Sending booking reminders"></textarea>
+  </div>
+
+  <div class="field">
+    <label>What are the top 3 business decisions you make repeatedly that you'd like help thinking through?</label>
+    <div class="field-hint">This shapes your CEO Agent — what it proactively brings to you.</div>
+    <textarea id="f-wr-decisions" placeholder="e.g. 1. Which leads to prioritize&#10;2. Whether to raise prices&#10;3. Which agents are performing and which aren't"></textarea>
+  </div>
+
+  <div class="field">
+    <label>Do you want your team members or agents to have access to any War Room tools?</label>
+    <select id="f-wr-team-access">
+      <option value="">Select one</option>
+      <option>War Room is mine only</option>
+      <option>I'd like specific agents to have limited access</option>
+      <option>Open to discussing — advise me</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Are you interested in a full AI operating structure for your business?</label>
+    <div class="field-hint">This is our Command tier — beyond the 7 agents, we build a complete internal AI org for your business: a strategic advisor, an operations manager, and an executive assistant that knows your entire operation and keeps everything moving. It's how you run multiple businesses without dropping anything.</div>
+    <select id="f-wr-command">
+      <option value="">Select one</option>
+      <option>Yes — I want the full operating structure</option>
+      <option>Maybe — tell me more before I decide</option>
+      <option>No — the 7 agents are enough for now</option>
+    </select>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-secondary" onclick="prev(6)">← Back</button>
+    <div class="step-count">6 of 7</div>
+    <button class="btn btn-primary" onclick="next(6)">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SECTION 7 — CURRENT TECH -->
+<div class="section" id="sec7">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Section 7 of 7</div>
+    <div class="sec-title">Your Current Tech</div>
+    <p class="sec-desc">This tells us what we're replacing, what we're keeping, and what we need to connect to. Critical for building without disrupting what you have running today.</p>
+  </div>
+
+  <div class="field">
+    <label>Do you currently use any CRM or contact management tool?</label>
+    <select id="f-tech-crm">
+      <option value="">Select one</option>
+      <option>Yes — HubSpot</option>
+      <option>Yes — Follow Up Boss</option>
+      <option>Yes — Salesforce</option>
+      <option>Yes — other (describe below)</option>
+      <option>No — just my phone contacts</option>
+      <option>No — nothing formal</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Do you use any email marketing or SMS tool?</label>
+    <select id="f-tech-email">
+      <option value="">Select one</option>
+      <option>Yes — Mailchimp</option>
+      <option>Yes — Constant Contact</option>
+      <option>Yes — other (describe below)</option>
+      <option>No — nothing</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>What do you use for scheduling and calendar management?</label>
+    <select id="f-tech-calendar">
+      <option value="">Select one</option>
+      <option>Google Calendar</option>
+      <option>Apple Calendar</option>
+      <option>Calendly</option>
+      <option>Nothing formal — mental calendar</option>
+      <option>Other</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Do you use any specific software for your tax business?</label>
+    <div class="field-hint">Example: TurboTax Pro, Drake, TaxSlayer, QuickBooks. Affects how we import your client list.</div>
+    <input type="text" id="f-tech-tax" placeholder="e.g. Drake Tax, or N/A">
+  </div>
+
+  <div class="field">
+    <label>Do you have an existing business phone number you use?</label>
+    <div class="field-hint">We provision a new dedicated number for your automation system. If you want to port your existing number in instead, we can discuss that — it's a longer process.</div>
+    <select id="f-tech-phone">
+      <option value="">Select one</option>
+      <option>Yes — I have a business number I use today</option>
+      <option>No — I use my personal cell for everything</option>
+      <option>Yes — and I'd want to explore porting it</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Do you use WhatsApp for business communication?</label>
+    <div class="field-hint">Common in Miami for clients with Latin American connections. If yes, we can build WhatsApp into the automation flow.</div>
+    <select id="f-tech-whatsapp">
+      <option value="">Select one</option>
+      <option>Yes — many of my clients prefer WhatsApp</option>
+      <option>Sometimes — a few clients use it</option>
+      <option>No — SMS and email only</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Do you operate in any regulated industry or have compliance requirements I should know about?</label>
+    <div class="field-hint">Example: Licensed contractor, financial services, legal, medical, real estate brokerage rules around automated messaging. Better to know before we build than after.</div>
+    <textarea id="f-compliance" placeholder="e.g. Florida Real Estate license requires disclosure on automated messages. Or: No compliance concerns I'm aware of."></textarea>
+  </div>
+
+  <hr class="divider">
+    <select id="f-tech-social">
+      <option value="">Select one</option>
+      <option>Later</option>
+      <option>Buffer</option>
+      <option>Hootsuite</option>
+      <option>I post manually</option>
+      <option>I rarely post</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>List any other software, apps, or tools you use regularly across any of your businesses</label>
+    <div class="field-hint">Even if you're not sure it's relevant — better to over-share here.</div>
+    <textarea id="f-tech-other" placeholder="e.g. DocuSign for contracts, QuickBooks for accounting, Slack with my team"></textarea>
+  </div>
+
+  <hr class="divider">
+
+  <div class="field">
+    <label>Is there anything about how you run your businesses, your clients, or your goals that I should know before I start building?</label>
+    <div class="field-hint">Open field. Anything this form didn't ask.</div>
+    <textarea id="f-anything-else" style="min-height:110px" placeholder="Anything at all — concerns, preferences, things that are important to you, past experiences with tech tools..."></textarea>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-secondary" onclick="prev(7)">← Back</button>
+    <div class="step-count">7 of 7</div>
+    <button class="btn btn-submit" id="submitBtn" onclick="submitForm()">Submit →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SUCCESS -->
+<div class="success" id="successScreen">
+  <div class="success-icon">✓</div>
+  <h2>You're in the system.</h2>
+  <p>Virgil will review your answers within 24 hours and reach out to confirm next steps. Keep an eye on your phone.</p>
+  <div class="success-steps">
+    <h4>What happens next</h4>
+    <ul>
+      <li>Your full proposal and pricing gets built</li>
+      <li>A 30-min call to confirm scope before we start</li>
+      <li>Agreement signed, first payment, build begins</li>
+      <li>Real estate system goes live first — within 2 weeks</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+const sections = 7;
+let current = 1;
+
+const sectionNames = ['','About You','Real Estate','Transportation','Tax Business','Websites','War Room','Current Tech'];
+
+function updateProgress() {
+  const pct = ((current-1) / sections * 100) + (100/sections * 0.5);
+  document.getElementById('progressBar').style.width = Math.min(pct, 95) + '%';
+  document.getElementById('progressText').textContent = `Section ${current} of ${sections} — ${sectionNames[current]}`;
+}
+
+function showSection(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec'+n).classList.add('active');
+  current = n;
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function next(from) {
+  // Validate required fields on section 1
+  if (from === 1) {
+    const required = ['f-name','f-phone','f-email','f-businesses','f-biz-desc','f-ideal-client'];
+    let valid = true;
+    required.forEach(id => {
+      const el = document.getElementById(id);
+      const field = el.closest('.field');
+      field.querySelectorAll('.field-error').forEach(e => e.remove());
+      if (!el.value.trim()) {
+        field.classList.add('error');
+        const err = document.createElement('div');
+        err.className = 'field-error';
+        err.textContent = 'This field is required.';
+        field.appendChild(err);
+        valid = false;
+      } else {
+        field.classList.remove('error');
+      }
+    });
+    if (!valid) { window.scrollTo({top:0,behavior:'smooth'}); return; }
+  }
+  showSection(from + 1);
+}
+
+function prev(from) { showSection(from - 1); }
+
+function toggleCheck(el) { el.classList.toggle('on'); }
+
+function getChecked(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return '';
+  return Array.from(group.querySelectorAll('.check-item.on span'))
+    .map(s => s.textContent).join(', ');
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const data = {
+    // Section 1
+    name: val('f-name'),
+    phone: val('f-phone'),
+    email: val('f-email'),
+    businesses: val('f-businesses'),
+    existing_websites: val('f-websites'),
+    biz_description: val('f-biz-desc'),
+    ideal_client: val('f-ideal-client'),
+    communication_style: val('f-voice'),
+    revenue_goals: val('f-goals'),
+    timezone: val('f-timezone'),
+    sending_hours: val('f-sending-hours'),
+    // Section 2 — Real Estate
+    re_license: val('f-re-license'),
+    re_markets: val('f-re-markets'),
+    re_focus: val('f-re-focus'),
+    re_lead_sources: getChecked('cg-re-leads'),
+    re_qualify_questions: val('f-re-qualify'),
+    re_response_time: val('f-re-response'),
+    re_booking_tool: val('f-re-booking-tool'),
+    re_post_booking: val('f-re-post-booking'),
+    re_agents: val('f-re-agents'),
+    re_assignment: val('f-re-assign'),
+    re_split: val('f-re-split'),
+    re_agent_access: getChecked('cg-re-agent-access'),
+    re_frustration: val('f-re-frustration'),
+    // Section 3 — Transportation
+    limo_name: val('f-limo-name'),
+    limo_vehicles: val('f-limo-vehicles'),
+    limo_contact_methods: getChecked('cg-limo-contact'),
+    limo_quote_info: val('f-limo-quote-info'),
+    limo_pricing: val('f-limo-pricing'),
+    limo_job_types: getChecked('cg-limo-jobs'),
+    limo_lost_bookings: val('f-limo-lost'),
+    limo_attract: val('f-limo-attract'),
+    limo_confirmations: val('f-limo-confirm'),
+    limo_goal: val('f-limo-goal'),
+    // Section 4 — Tax
+    tax_name: val('f-tax-name'),
+    tax_client_list: val('f-tax-list'),
+    tax_list_size: val('f-tax-list-size'),
+    tax_busy_months: getChecked('cg-tax-months'),
+    tax_avg_fee: val('f-tax-fee'),
+    tax_lead_sources: getChecked('cg-tax-leads'),
+    tax_referral: val('f-tax-referral'),
+    // Section 5 — Websites
+    web1_domain: val('f-web1-domain'),
+    web1_cta: val('f-web1-cta'),
+    web1_inspo: val('f-web1-inspo'),
+    web1_photos: val('f-web1-photos'),
+    web1_brand: val('f-web1-brand'),
+    web1_form: val('f-web1-form'),
+    web1_complexity: val('f-web1-complexity'),
+    web2_domain: val('f-web2-domain'),
+    web2_cta: val('f-web2-cta'),
+    web2_feel: val('f-web2-feel'),
+    web3_domain: val('f-web3-domain'),
+    web3_cta: val('f-web3-cta'),
+    web3_feel: val('f-web3-feel'),
+    // Section 6 — War Room
+    wr_competitors: val('f-wr-competitors'),
+    wr_social: val('f-wr-social'),
+    wr_content: val('f-wr-content'),
+    wr_daily_time: val('f-wr-time'),
+    wr_automate: val('f-wr-automate'),
+    wr_decisions: val('f-wr-decisions'),
+    wr_team_access: val('f-wr-team-access'),
+    wr_command_tier: val('f-wr-command'),
+    // Section 7 — Tech
+    tech_crm: val('f-tech-crm'),
+    tech_phone: val('f-tech-phone'),
+    tech_whatsapp: val('f-tech-whatsapp'),
+    tech_compliance: val('f-compliance'),
+    tech_email: val('f-tech-email'),
+    tech_calendar: val('f-tech-calendar'),
+    tech_tax_software: val('f-tech-tax'),
+    tech_social: val('f-tech-social'),
+    tech_other: val('f-tech-other'),
+    anything_else: val('f-anything-else'),
+  };
+
+  try {
+    const res = await fetch('https://formspree.io/f/mjgdqraa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      document.getElementById('sec7').classList.remove('active');
+      document.getElementById('successScreen').classList.add('show');
+      document.getElementById('progressBar').style.width = '100%';
+      document.getElementById('progressText').textContent = 'Complete — Thank you';
+      window.scrollTo({top:0,behavior:'smooth'});
+    } else {
+      throw new Error('Submit failed');
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Submit →';
+    alert('Something went wrong. Please email your responses directly to virgil@ativos.com');
+  }
+}
+
+updateProgress();
+</script>
+</body>
+</html>
