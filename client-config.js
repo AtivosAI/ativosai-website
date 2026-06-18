@@ -1,7 +1,7 @@
 const CLIENTS = {
-  'melvin-lara': {
-    name: 'Melvin Lara',
-    greeting: 'Melvin',
+  'marvin-lara': {
+    name: 'Marvin Lara',
+    greeting: 'Marvin',
     businesses: 'Real Estate Brokerage, Transportation, Tax',
     vertical: 'Multi-business Command',
     placeholder_businesses: 'Lara Real Estate Group\nLara Luxury Transportation\nLara Tax Services',
