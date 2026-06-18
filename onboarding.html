@@ -119,6 +119,7 @@ body{font-family:'Inter',Arial,sans-serif;background:#0A1628;color:#E2ECF4;-webk
 }
 </style>
 <script src="/client-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -1002,14 +1003,10 @@ async function submitForm() {
   };
 
   try {
-    const formId = (window._clientConfig && window._clientConfig.formId) || 'mjgdqraa';
-    const res = await fetch('https://formspree.io/f/' + formId, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(data)
-    });
+    emailjs.init('BbEwOkrGbsZgHhV55');
+    await emailjs.send('service_f0ucv31', 'template_vfc5vma', data);
 
-    if (res.ok) {
+    if (true) {
       document.getElementById('sec7').classList.remove('active');
       document.getElementById('successScreen').classList.add('show');
       document.getElementById('progressBar').style.width = '100%';
